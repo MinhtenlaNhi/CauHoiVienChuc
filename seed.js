@@ -10,14 +10,31 @@ if (!URI) {
   process.exit(1);
 }
 
-// Nạp questions.js (file dùng window.QUIZ_DATA = [...])
-const code = readFileSync(new URL('./questions.js', import.meta.url), 'utf8');
-const win = {};
-new Function('window', code)(win);
-const DATA = win.QUIZ_DATA || [];
+// Nạp dữ liệu gốc + dữ liệu bổ sung
+const DATA = [];
+const sources = ['./questions.js'];
+
+for (const source of sources) {
+  try {
+    const code = readFileSync(new URL(source, import.meta.url), 'utf8');
+    const win = {};
+    new Function('window', code)(win);
+
+    const list = win.QUIZ_DATA || win.QUIZ_EXTRA_DATA || [];
+    if (Array.isArray(list) && list.length) {
+      DATA.push(...list);
+    }
+  } catch (err) {
+    // Nếu file bổ sung chưa tồn tại, bỏ qua an toàn.
+    if (source.endsWith('questions.js')) {
+      console.error(`Không đọc được dữ liệu từ ${source}:`, err.message);
+      process.exit(1);
+    }
+  }
+}
 
 if (!DATA.length) {
-  console.error('Không đọc được dữ liệu từ questions.js');
+  console.error('Không đọc được dữ liệu từ questions.js hoặc file bổ sung');
   process.exit(1);
 }
 

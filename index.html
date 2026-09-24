@@ -236,9 +236,23 @@ function shuffle(arr){
   return a;
 }
 
+function shuffleOptions(question){
+  const options = question.options.map((text, index) => ({
+    text,
+    isCorrect: index === question.answer,
+  }));
+  const shuffled = shuffle(options);
+  return {
+    ...question,
+    options: shuffled.map(option => option.text),
+    answer: shuffled.findIndex(option => option.isCorrect),
+  };
+}
+
 function runQuiz(meta, questions){
   let qs = questions.slice();
   if(meta.isExam || $("shuffleQ").checked) qs = shuffle(qs);
+  qs = qs.map(shuffleOptions);
   state = { meta, qs, cur:0, answers:new Array(qs.length).fill(null) };
   $("home").classList.add("hidden");
   $("result").classList.add("hidden");
