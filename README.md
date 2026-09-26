@@ -3,8 +3,8 @@
 Ứng dụng web ôn tập trắc nghiệm theo các văn bản tuyển dụng giáo viên, dữ liệu câu hỏi lưu trên **MongoDB Atlas**.
 
 ## Tính năng
-- **1.020 câu hỏi** (60 câu/đề × 17 mục hiện có): mỗi đề gồm 40 câu ghép kiến thức và 20 câu ghép bổ sung được biên soạn từ các dữ kiện trong mục.
-- **Ôn theo từng văn bản** (60 câu/đề). Mục 7 và 8 có tài liệu nguồn nhưng không có sẵn bộ câu hỏi; các câu quiz ở đó được biên soạn từ nội dung/ngân hàng hiện có.
+- **1.139 câu hỏi** trong 17 mục: mỗi mục có bộ câu ghép kiến thức và các câu hỏi được trích từ phần hỏi - đáp trong PDF nguồn khi tài liệu có phần này.
+- **Ôn theo từng văn bản**; các câu hỏi PDF giữ nguyên nội dung câu hỏi và đáp án tham khảo, sau đó được chuyển thành 4 lựa chọn để làm quiz.
 - **Làm đề tổng hợp**: lấy ngẫu nhiên 30/40/60/90/120 câu từ tất cả văn bản (MongoDB `$sample`).
 - Chấm điểm, xem lại bài làm kèm giải thích, trộn câu hỏi.
 
@@ -42,4 +42,5 @@ Mở trình duyệt tại http://localhost:3000
 | `index.html` | Giao diện web, lấy dữ liệu qua API |
 | `server.js` | Express server + API (`/api/topics`, `/api/topics/:index/questions`, `/api/exam?n=`) |
 | `seed.js` | Nạp `questions.js` lên MongoDB |
-| `questions.js` | Ngân hàng câu hỏi nguồn và bộ ghép câu hỏi thử thách |
+| `questions.js` | Ngân hàng câu hỏi, câu ghép thử thách và câu hỏi trích từ PDF |
+| `extract_pdf_questions.py` | Trích câu hỏi/đáp án từ PDF và OCR các PDF dạng scan |
