@@ -1,5 +1,5 @@
 // Ngân hàng câu hỏi trắc nghiệm ôn thi Tuyển Giáo viên
-// Mỗi đề tương ứng 1 văn bản, 40 câu trọng điểm. answer = chỉ số đáp án đúng (0-3).
+// Mỗi đề tương ứng 1 văn bản, 60 câu thử thách. answer = chỉ số đáp án đúng (0-3).
 window.QUIZ_DATA = [
 /* ====================== ĐỀ 1: LUẬT GIÁO DỤC 2019 ====================== */
 {
@@ -814,3 +814,58 @@ window.QUIZ_DATA = [
     ]
   }
 ];
+
+// Mỗi câu mới yêu cầu đối chiếu đồng thời hai điểm kiến thức của cùng một mục.
+function buildChallengeQuestions(source, topicIndex, offset, count = source.length) {
+  if (source.length < 2) return source;
+
+  return Array.from({ length: count }, (_, index) => {
+    const first = source[index % source.length];
+    const second = source[(index + offset) % source.length];
+    const correctPair = [first.options[first.answer], second.options[second.answer]];
+    const pairs = [correctPair];
+    const addPair = pair => {
+      if (!pairs.some(existing => existing[0] === pair[0] && existing[1] === pair[1])) {
+        pairs.push(pair);
+      }
+    };
+
+    const firstWrongOptions = [...new Set(first.options)].filter(option => option !== correctPair[0]);
+    const secondWrongOptions = [...new Set(second.options)].filter(option => option !== correctPair[1]);
+    if (firstWrongOptions.length) addPair([firstWrongOptions[0], correctPair[1]]);
+    if (secondWrongOptions.length) addPair([correctPair[0], secondWrongOptions[0]]);
+    if (firstWrongOptions.length && secondWrongOptions.length) {
+      addPair([firstWrongOptions[0], secondWrongOptions[0]]);
+    }
+    for (const firstOption of first.options) {
+      for (const secondOption of second.options) {
+        addPair([firstOption, secondOption]);
+      }
+    }
+
+    const baseOptions = pairs.slice(0, 4).map(pair => `1) ${pair[0]} | 2) ${pair[1]}`);
+    const rotation = (topicIndex + index) % baseOptions.length;
+    const options = baseOptions.slice(rotation).concat(baseOptions.slice(0, rotation));
+
+    return {
+      q: `Yêu cầu 1: ${first.q}\nYêu cầu 2: ${second.q}\nChọn cặp đáp án đúng theo thứ tự.`,
+      options,
+      answer: (baseOptions.length - rotation) % baseOptions.length,
+      explain: `Cặp đáp án đúng lần lượt là: ${correctPair[0]} và ${correctPair[1]}. ${first.explain || ''} ${second.explain || ''}`.trim(),
+    };
+  });
+}
+
+window.QUIZ_DATA = window.QUIZ_DATA.map((topic, topicIndex) => {
+  const coreQuestions = buildChallengeQuestions(
+    topic.questions,
+    topicIndex,
+    Math.max(1, Math.floor(topic.questions.length / 2) - 3),
+  );
+  const additionalQuestions = buildChallengeQuestions(topic.questions, topicIndex, 11, 20);
+
+  return {
+    ...topic,
+    questions: [...coreQuestions, ...additionalQuestions],
+  };
+});
