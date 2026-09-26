@@ -72,9 +72,21 @@ def parse_questions(text):
     return questions
 
 
+def summarize_answer(answer, limit=260):
+    answer = re.sub(r"\s+", " ", answer).strip(" -:;")
+    answer = re.sub(r"(?:\*\s*)?(?:Mục tiêu giáo dục|Tính chất, nguyên lý giáo dục)\s*", "", answer)
+    parts = [part.strip(" -;,.:") for part in re.split(r"\s+-\s+|;\s+", answer) if part.strip()]
+    summary = "; ".join(parts[:3])
+    if len(summary) <= limit:
+        return summary
+    shortened = summary[:limit].rsplit(" ", 1)[0].rstrip(";,.:")
+    return shortened + "..."
+
+
 def make_options(answer, pool):
+    answer = summarize_answer(answer)
     distractors = [item for item in pool if item != answer]
-    options = [answer, *distractors[:3]]
+    options = [answer, *[summarize_answer(item) for item in distractors[:3]]]
     while len(options) < 4:
         options.append("Nội dung này không được quy định trong văn bản.")
     return options
@@ -96,10 +108,10 @@ def main():
             questions = parse_questions(ocr_text(pdf_path))
         if not questions:
             continue
-        answers = [answer for _, _, answer in questions]
+        answers = [summarize_answer(answer) for _, _, answer in questions]
         imported = []
         for number, question, answer in questions:
-            options = make_options(answer, answers)
+            options = make_options(summarize_answer(answer), answers)
             imported.append({
                 "q": question,
                 "options": options,
