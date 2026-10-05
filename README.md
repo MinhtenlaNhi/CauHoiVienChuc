@@ -3,7 +3,7 @@
 Ứng dụng web ôn tập trắc nghiệm theo các văn bản tuyển dụng giáo viên, dữ liệu câu hỏi lưu trên **MongoDB Atlas**.
 
 ## Tính năng
-- **1.139 câu hỏi** trong 17 mục: mỗi mục có bộ câu ghép kiến thức và các câu hỏi được trích từ phần hỏi - đáp trong PDF nguồn khi tài liệu có phần này.
+- **1.200 câu hỏi** trong 17 mục: mỗi mục có bộ câu ghép kiến thức và các câu hỏi được trích từ phần hỏi - đáp trong PDF nguồn khi tài liệu có phần này.
 - **Ôn theo từng văn bản**; các câu hỏi PDF giữ nguyên nội dung câu hỏi và đáp án tham khảo, sau đó được chuyển thành 4 lựa chọn để làm quiz.
 - **Làm đề tổng hợp**: lấy ngẫu nhiên 30/40/60/90/120 câu từ tất cả văn bản (MongoDB `$sample`).
 - Chấm điểm, xem lại bài làm kèm giải thích, trộn câu hỏi.
