@@ -33,11 +33,6 @@ for (const source of sources) {
   }
 }
 
-if (!DATA.length) {
-  console.error('Không đọc được dữ liệu từ questions.js hoặc file bổ sung');
-  process.exit(1);
-}
-
 // Làm phẳng thành các document câu hỏi
 const docs = [];
 DATA.forEach((topic, ti) => {
@@ -67,8 +62,12 @@ try {
   await col.deleteMany({});
   console.log('Đã xóa dữ liệu cũ trong collection "questions".');
 
-  const res = await col.insertMany(docs);
-  console.log(`Đã nạp ${res.insertedCount} câu hỏi (${DATA.length} đề).`);
+  if (docs.length) {
+    const res = await col.insertMany(docs);
+    console.log(`Đã nạp ${res.insertedCount} câu hỏi (${DATA.length} đề).`);
+  } else {
+    console.log('Không có câu hỏi mới; collection đã được làm trống.');
+  }
 
   // Index hỗ trợ truy vấn theo đề
   await col.createIndex({ topicIndex: 1, qIndex: 1 });
